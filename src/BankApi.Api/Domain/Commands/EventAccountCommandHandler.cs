@@ -17,10 +17,12 @@ namespace BankApi.Api.Domain.Commands
             switch (request.Type)
             {
                 case "deposit":
-                    return await mediator.Send(new DepositAccountCommand { Destination = request.Destination!.Value, Amount = request.Amount }, cancellationToken);
+                    var depositResult = await mediator.Send(new DepositAccountCommand { Destination = request.Destination!.Value, Amount = request.Amount }, cancellationToken);
+                    return depositResult.IsSuccess ? Result<object>.Success(depositResult.Value!) : Result<object>.Failure(depositResult.Error!);
+
                 case "withdraw":
-                    var result = await mediator.Send(new WithdrawAccountCommand { Origin = request.Origin!.Value, Amount = request.Amount }, cancellationToken);
-                    return result.IsSuccess ? Result<object>.Success(result.Value!) : Result<object>.Failure(result.Error!);
+                    var withdrawResult = await mediator.Send(new WithdrawAccountCommand { Origin = request.Origin!.Value, Amount = request.Amount }, cancellationToken);
+                    return withdrawResult.IsSuccess ? Result<object>.Success(withdrawResult.Value!) : Result<object>.Failure(withdrawResult.Error!);
                 default:
                     throw new NotImplementedException();
             }
