@@ -19,14 +19,14 @@ namespace BankApi.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAccount([FromBody] CreateAccountCommand command)
+        public async Task<ActionResult<object>> PostMethod([FromBody] EventAcountCommand command)
         {
             var result = await mediator.Send(command);
-            return Ok(result);
+            return result.ToActionResult();
         }
 
         [HttpGet]
-        public async Task<ActionResult<Account>> GetAccount([FromQuery] GetAccountQuery query)
+        public async Task<ActionResult<decimal>> GetAccount([FromQuery] GetAccountQuery query)
         {
             var result = await mediator.Send(query);
             return result.ToActionResult();

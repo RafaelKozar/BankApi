@@ -4,16 +4,16 @@ using MediatR;
 
 namespace BankApi.Api.Domain.Commands
 {
-    public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, Account>
+    public class DepositAccountCommandHandler : IRequestHandler<DepositAccountCommand, Account>
     {
         private readonly IAccountRepository _accountRepository;
 
-        public CreateAccountCommandHandler(IAccountRepository accountRepository)
+        public DepositAccountCommandHandler(IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
         }
 
-        public async Task<Account> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Account> Handle(DepositAccountCommand request, CancellationToken cancellationToken)
         {
             var account = new Account
             {
