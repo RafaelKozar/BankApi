@@ -1,10 +1,11 @@
-﻿using BankApi.Api.Domain.Models;
+﻿using BankApi.Api.Domain.DTOs;
+using BankApi.Api.Domain.Models;
 using BankApi.Api.Domain.Repositories;
 using MediatR;
 
 namespace BankApi.Api.Domain.Commands
 {
-    public class DepositAccountCommandHandler : IRequestHandler<DepositAccountCommand, Account>
+    public class DepositAccountCommandHandler : IRequestHandler<DepositAccountCommand, AccountDestinationDto>
     {
         private readonly IAccountRepository _accountRepository;
 
@@ -13,9 +14,17 @@ namespace BankApi.Api.Domain.Commands
             _accountRepository = accountRepository;
         }
 
-        public Task<Account> Handle(DepositAccountCommand request, CancellationToken cancellationToken)
+        public async Task<AccountDestinationDto> Handle(DepositAccountCommand request, CancellationToken cancellationToken)
         {
-            return _accountRepository.Deposit(request.Destination, request.Amount);
+            var account = await _accountRepository.Deposit(request.Destination, request.Amount);
+            return new AccountDestinationDto
+            {
+                Destination = new AccountDto
+                {
+                    Id = account.Id,
+                    Balance = account.Balance
+                }
+            };
         }
     }
 }
