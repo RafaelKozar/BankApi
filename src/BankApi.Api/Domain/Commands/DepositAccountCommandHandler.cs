@@ -13,17 +13,9 @@ namespace BankApi.Api.Domain.Commands
             _accountRepository = accountRepository;
         }
 
-        public async Task<Account> Handle(DepositAccountCommand request, CancellationToken cancellationToken)
+        public Task<Account> Handle(DepositAccountCommand request, CancellationToken cancellationToken)
         {
-            var account = new Account
-            {
-                Id = request.Destination,
-                Balance = request.Amount
-            };
-
-            var result = await _accountRepository.Add(account);
-
-            return result;
+            return _accountRepository.Deposit(request.Destination, request.Amount);
         }
     }
 }

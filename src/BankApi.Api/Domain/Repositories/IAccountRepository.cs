@@ -7,5 +7,7 @@ namespace BankApi.Api.Domain.Repositories
         public Task<Account> Add(Account account);
 
         public Task<Account?> Get(long id);
+
+        public Task<Account> Deposit(long id, decimal amount);
     }
 }

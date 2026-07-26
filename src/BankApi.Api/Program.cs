@@ -13,8 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
-builder.Services.AddSingleton<IDbConnectionFactory, SqliteInMemoryConnectionFactory>();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddSingleton<IAccountRepository, InMemoryAccountRepository>();
 
 var app = builder.Build();
 
