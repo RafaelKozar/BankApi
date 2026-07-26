@@ -2,7 +2,7 @@
 {
     public class AccountTransferDto
     {
-        public AccountOriginDto Origin { get; set; } = new AccountOriginDto();
-        public AccountDestinationDto Destination { get; set; } = new AccountDestinationDto();        
+        public AccountDto Origin { get; set; } = new AccountDto();
+        public AccountDto Destination { get; set; } = new AccountDto();        
     }
 }

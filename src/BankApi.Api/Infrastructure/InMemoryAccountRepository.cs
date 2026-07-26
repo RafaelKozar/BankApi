@@ -7,7 +7,8 @@ namespace BankApi.Api.Infrastructure
     public class InMemoryAccountRepository : IAccountRepository
     {
         private readonly ConcurrentDictionary<long, Account> _accounts = new();
-
+        private readonly ConcurrentDictionary<long, SemaphoreSlim> _locks = new();
+        
         public Task<Account> Add(Account account)
         {
             _accounts[account.Id] = account;
@@ -47,5 +48,57 @@ namespace BankApi.Api.Infrastructure
                 }
             }
         }
+
+        public async Task<Dictionary<int, Account>?> WithdrawWithLock(long origin, long destination, decimal amount)
+        {
+            var lesserId = Math.Min(origin, destination);
+            var greaterId = Math.Max(origin, destination);
+            var lockFirst = GetLock(lesserId);
+            var lockSecond = GetLock(greaterId);
+            await lockFirst.WaitAsync();
+            await lockSecond.WaitAsync();
+            try
+            {
+                if (!_accounts.TryGetValue(origin, out var existingOrigin))
+                {
+                    return null;
+                }
+
+                if (!_accounts.TryGetValue(destination, out var existingDestination))
+                {
+                    return null;
+                }
+
+                var updatedOrigin = new Account { Id = existingOrigin.Id, Balance = existingOrigin.Balance - amount };
+                if (_accounts.TryUpdate(origin, updatedOrigin, existingOrigin))
+                {
+                    var updatedDestination = new Account { Id = existingDestination.Id, Balance = existingDestination.Balance + amount };
+                    if (_accounts.TryUpdate(destination, updatedDestination, existingDestination))
+                    {
+                        return new Dictionary<int, Account>
+                        {
+                            { (int)origin, updatedOrigin },
+                            { (int)destination, updatedDestination }
+                        };
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            finally
+            {
+                lockSecond.Release();
+                lockFirst.Release();
+            }
+        }
+
+        private SemaphoreSlim GetLock(long id) =>
+                _locks.GetOrAdd(id, _ => new SemaphoreSlim(1, 1));
     }
 }
