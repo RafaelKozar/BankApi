@@ -20,9 +20,9 @@ namespace BankApi.Api.Infrastructure
             return account;
         }
 
-        public Task<Account> Get(long id)
+        public Task<Account?> Get(long id)
         {
-            return _connection.QuerySingleOrDefaultAsync<Account>(
+            return _connection.QuerySingleOrDefaultAsync<Account?>(
                 "SELECT Id, BALANCE as Balance FROM Contas WHERE Id = @Id",
                 new { Id = id });
         }

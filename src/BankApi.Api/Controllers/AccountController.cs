@@ -1,5 +1,7 @@
 ﻿using BankApi.Api.Domain.Commands;
+using BankApi.Api.Domain.Models;
 using BankApi.Api.Domain.Query;
+using BankApi.Api.Infrastructure.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,10 +26,10 @@ namespace BankApi.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAccount([FromQuery] GetAccountQuery query)
-        {            
+        public async Task<ActionResult<Account>> GetAccount([FromQuery] GetAccountQuery query)
+        {
             var result = await mediator.Send(query);
-            return Ok(result);
+            return result.ToActionResult();
         }
 
     }
