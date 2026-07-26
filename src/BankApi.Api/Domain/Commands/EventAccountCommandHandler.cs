@@ -14,11 +14,16 @@ namespace BankApi.Api.Domain.Commands
 
         public async Task<Result<object>> Handle(EventAcountCommand request, CancellationToken cancellationToken)
         {
-            return request.Type switch
+            switch (request.Type)
             {
-                "deposit" => await mediator.Send(new DepositAccountCommand { Destination = request.Destination!.Value, Amount = request.Amount }, cancellationToken),
-                _ => throw new NotImplementedException()
-            };
+                case "deposit":
+                    return await mediator.Send(new DepositAccountCommand { Destination = request.Destination!.Value, Amount = request.Amount }, cancellationToken);
+                case "withdraw":
+                    var result = await mediator.Send(new WithdrawAccountCommand { Origin = request.Origin!.Value, Amount = request.Amount }, cancellationToken);
+                    return result.IsSuccess ? Result<object>.Success(result.Value!) : Result<object>.Failure(result.Error!);
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

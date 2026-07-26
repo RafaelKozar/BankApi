@@ -29,5 +29,23 @@ namespace BankApi.Api.Infrastructure
 
             return Task.FromResult(account);
         }
+
+        public Task<Account?> Withdraw(long id, decimal amount)
+        {
+            while (true)
+            {
+                if (!_accounts.TryGetValue(id, out var existing))
+                {
+                    return Task.FromResult<Account?>(null);
+                }
+
+                var updated = new Account { Id = existing.Id, Balance = existing.Balance - amount };
+
+                if (_accounts.TryUpdate(id, updated, existing))
+                {
+                    return Task.FromResult<Account?>(updated);
+                }
+            }
+        }
     }
 }
