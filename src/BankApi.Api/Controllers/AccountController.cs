@@ -21,7 +21,7 @@ namespace BankApi.Api.Controllers
         public async Task<ActionResult<object>> PostMethod([FromBody] EventAcountCommand command)
         {
             var result = await mediator.Send(command);
-            return result.ToActionResult();
+            return result.ToActionResult(StatusCodes.Status201Created);
         }
 
         [HttpGet("/balance")]
