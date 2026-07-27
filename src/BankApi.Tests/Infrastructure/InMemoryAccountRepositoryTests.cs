@@ -68,5 +68,30 @@ namespace BankApi.Tests.Infrastructure
             Assert.NotNull(account);
             Assert.Equal(concurrentDeposits * amount, account!.Balance);
         }
+
+        [Fact]
+        public async Task Get_ShouldReturnAccount_WhenAccountExists()
+        {
+            // Arrange
+            await _repository.Add(new Account { Id = 1, Balance = 100m });
+
+            // Act
+            var account = await _repository.Get(1);
+
+            // Assert
+            Assert.NotNull(account);
+            Assert.Equal(1, account!.Id);
+            Assert.Equal(100m, account.Balance);
+        }
+
+        [Fact]
+        public async Task Get_ShouldReturnNull_WhenAccountDoesNotExist()
+        {
+            // Act
+            var account = await _repository.Get(999);
+
+            // Assert
+            Assert.Null(account);
+        }
     }
 }
