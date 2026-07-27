@@ -14,15 +14,7 @@ namespace BankApi.Api.Infrastructure.Results
 
             var statusCode = MapStatusCode(result.Error!.Type);
 
-            return new ObjectResult(new ProblemDetails
-            {
-                Status = statusCode,
-                Title = result.Error.Type.ToString(),
-                Detail = result.Error.Message
-            })
-            {
-                StatusCode = statusCode
-            };
+            return new StatusCodeResult(statusCode);
         }
 
         private static int MapStatusCode(ErrorType type) => type switch
