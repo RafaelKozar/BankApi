@@ -76,7 +76,8 @@ namespace BankApi.Api.Infrastructure
 
                 if (!_accounts.TryGetValue(destination, out var existingDestination))
                 {
-                    return null;
+                    existingDestination = new Account { Id = destination, Balance = 0m };
+                    _accounts[destination] = existingDestination;
                 }
 
                 var updatedOrigin = existingOrigin.Withdraw(amount);
