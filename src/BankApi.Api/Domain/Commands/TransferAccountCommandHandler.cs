@@ -27,13 +27,13 @@ namespace BankApi.Api.Domain.Commands
                 {
                     Origin = new AccountDto
                     {
-                        Id = transferResult[(int)request.Origin].Id,
-                        Balance = transferResult[(int)request.Origin].Balance
+                        Id = transferResult[request.Origin].Id,
+                        Balance = transferResult[request.Origin].Balance
                     },
                     Destination = new AccountDto
                     {
-                        Id = transferResult[(int)request.Destination].Id,
-                        Balance = transferResult[(int)request.Destination].Balance
+                        Id = transferResult[request.Destination].Id,
+                        Balance = transferResult[request.Destination].Balance
                     }
                 });
             }

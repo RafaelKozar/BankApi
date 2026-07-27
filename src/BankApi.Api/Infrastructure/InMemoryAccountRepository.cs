@@ -21,35 +21,45 @@ namespace BankApi.Api.Infrastructure
             return Task.FromResult(account);
         }
 
-        public Task<Account> Deposit(long id, decimal amount)
+        public async Task<Account> Deposit(long id, decimal amount)
         {
-            var account = _accounts.AddOrUpdate(
-                id,
-                addValueFactory: _ => new Account { Id = id, Balance = amount },
-                updateValueFactory: (_, existing) => new Account { Id = existing.Id, Balance = existing.Balance + amount });
-
-            return Task.FromResult(account);
-        }
-
-        public Task<Account?> Withdraw(long id, decimal amount)
-        {
-            while (true)
+            var @lock = GetLock(id);
+            await @lock.WaitAsync();
+            try
             {
-                if (!_accounts.TryGetValue(id, out var existing))
-                {
-                    return Task.FromResult<Account?>(null);
-                }
-
-                var updated = new Account { Id = existing.Id, Balance = existing.Balance - amount };
-
-                if (_accounts.TryUpdate(id, updated, existing))
-                {
-                    return Task.FromResult<Account?>(updated);
-                }
+                return _accounts.AddOrUpdate(
+                    id,
+                    addValueFactory: _ => new Account { Id = id, Balance = amount },
+                    updateValueFactory: (_, existing) => new Account { Id = existing.Id, Balance = existing.Balance + amount });
+            }
+            finally
+            {
+                @lock.Release();
             }
         }
 
-        public async Task<Dictionary<int, Account>?> Transfer(long origin, long destination, decimal amount)
+        public async Task<Account?> Withdraw(long id, decimal amount)
+        {
+            var @lock = GetLock(id);
+            await @lock.WaitAsync();
+            try
+            {
+                if (!_accounts.TryGetValue(id, out var existing))
+                {
+                    return null;
+                }
+
+                var updated = new Account { Id = existing.Id, Balance = existing.Balance - amount };
+                _accounts.TryUpdate(id, updated, existing);
+                return updated;
+            }
+            finally
+            {
+                @lock.Release();
+            }
+        }
+
+        public async Task<Dictionary<long, Account>?> Transfer(long origin, long destination, decimal amount)
         {
             var lesserId = Math.Min(origin, destination);
             var greaterId = Math.Max(origin, destination);
@@ -70,26 +80,16 @@ namespace BankApi.Api.Infrastructure
                 }
 
                 var updatedOrigin = new Account { Id = existingOrigin.Id, Balance = existingOrigin.Balance - amount };
-                if (_accounts.TryUpdate(origin, updatedOrigin, existingOrigin))
+                _accounts.TryUpdate(origin, updatedOrigin, existingOrigin);
+
+                var updatedDestination = new Account { Id = existingDestination.Id, Balance = existingDestination.Balance + amount };
+                _accounts.TryUpdate(destination, updatedDestination, existingDestination);
+
+                return new Dictionary<long, Account>
                 {
-                    var updatedDestination = new Account { Id = existingDestination.Id, Balance = existingDestination.Balance + amount };
-                    if (_accounts.TryUpdate(destination, updatedDestination, existingDestination))
-                    {
-                        return new Dictionary<int, Account>
-                        {
-                            { (int)origin, updatedOrigin },
-                            { (int)destination, updatedDestination }
-                        };
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    return null;
-                }
+                    { origin, updatedOrigin },
+                    { destination, updatedDestination }
+                };
             }
             finally
             {

@@ -19,7 +19,7 @@ namespace BankApi.Api.Infrastructure.Results
 
         private static int MapStatusCode(ErrorType type) => type switch
         {
-            ErrorType.NotFound => StatusCodes.Status404NotFound,          
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
             _ => StatusCodes.Status500InternalServerError
         };
     }
