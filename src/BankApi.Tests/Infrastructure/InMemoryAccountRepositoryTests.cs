@@ -247,5 +247,35 @@ namespace BankApi.Tests.Infrastructure
             Assert.Equal(1000m, accountOne!.Balance);
             Assert.Equal(1000m, accountTwo!.Balance);
         }
+
+        [Fact]
+        public async Task Reset_ShouldRemoveAllAccounts()
+        {
+            // Arrange
+            await _repository.Add(new Account { Id = 1, Balance = 100m });
+            await _repository.Add(new Account { Id = 2, Balance = 50m });
+
+            // Act
+            await _repository.Reset();
+
+            // Assert
+            Assert.Null(await _repository.Get(1));
+            Assert.Null(await _repository.Get(2));
+        }
+
+        [Fact]
+        public async Task Reset_ShouldAllowCreatingAccountAgain_WithFreshBalance()
+        {
+            // Arrange
+            await _repository.Add(new Account { Id = 1, Balance = 100m });
+            await _repository.Reset();
+
+            // Act
+            var account = await _repository.Deposit(1, 50m);
+
+            // Assert
+            Assert.Equal(50m, account.Balance);
+        }
+        
     }
 }
