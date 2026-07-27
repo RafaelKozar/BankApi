@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankApi.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -18,14 +17,14 @@ namespace BankApi.Api.Controllers
             this.mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpPost("/event")]
         public async Task<ActionResult<object>> PostMethod([FromBody] EventAcountCommand command)
         {
             var result = await mediator.Send(command);
             return result.ToActionResult();
         }
 
-        [HttpGet]
+        [HttpGet("/balance")]
         public async Task<ActionResult<decimal>> GetAccount([FromQuery] GetAccountQuery query)
         {
             var result = await mediator.Send(query);
