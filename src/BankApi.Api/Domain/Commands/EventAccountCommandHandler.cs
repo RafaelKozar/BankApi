@@ -19,7 +19,6 @@ namespace BankApi.Api.Domain.Commands
                 case "deposit":
                     var depositResult = await mediator.Send(new DepositAccountCommand { Destination = request.Destination!.Value, Amount = request.Amount }, cancellationToken);
                     return depositResult.IsSuccess ? Result<object>.Success(depositResult.Value!) : Result<object>.Failure(depositResult.Error!);
-
                 case "withdraw":
                     var withdrawResult = await mediator.Send(new WithdrawAccountCommand { Origin = request.Origin!.Value, Amount = request.Amount }, cancellationToken);
                     return withdrawResult.IsSuccess ? Result<object>.Success(withdrawResult.Value!) : Result<object>.Failure(withdrawResult.Error!);

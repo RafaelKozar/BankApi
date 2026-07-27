@@ -6,3 +6,5 @@
 /src/BankApi.Api/obj
 /.vs/BankApi.slnx
 .vs/
+src/BankApi.Tests/obj/
+src/BankApi.Tests/bin/
