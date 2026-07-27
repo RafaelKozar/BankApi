@@ -49,7 +49,7 @@ namespace BankApi.Api.Infrastructure
             }
         }
 
-        public async Task<Dictionary<int, Account>?> WithdrawWithLock(long origin, long destination, decimal amount)
+        public async Task<Dictionary<int, Account>?> Transfer(long origin, long destination, decimal amount)
         {
             var lesserId = Math.Min(origin, destination);
             var greaterId = Math.Max(origin, destination);
