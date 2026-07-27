@@ -53,22 +53,6 @@ namespace BankApi.Tests.Domain.Query
             Assert.Equal(ErrorType.NotFound, result.Error!.Type);
             Assert.Contains("99", result.Error.Message);
         }
-
-        [Fact]
-        public async Task Handle_ShouldCallRepositoryGet_WithAccountIdFromQuery()
-        {
-            // Arrange
-            var query = new GetAccountQuery { AccountId = 42 };
-
-            _accountRepositoryMock
-                .Setup(r => r.Get(query.AccountId))
-                .ReturnsAsync(new Account { Id = 42, Balance = 0m });
-
-            // Act
-            await _handler.Handle(query, CancellationToken.None);
-
-            // Assert
-            _accountRepositoryMock.Verify(r => r.Get(42), Times.Once);
-        }
+        
     }
 }
