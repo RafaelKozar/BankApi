@@ -4,7 +4,7 @@ using MediatR;
 
 namespace BankApi.Api.Domain.Commands
 {
-    public class TransferCommand : IRequest<Result<AccountTransferDto>>
+    public class TransferAccountCommand : IRequest<Result<AccountTransferDto>>
     {
         public long Destination { get; set; }
         public decimal Amount { get; set; }

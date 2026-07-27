@@ -23,6 +23,9 @@ namespace BankApi.Api.Domain.Commands
                 case "withdraw":
                     var withdrawResult = await mediator.Send(new WithdrawAccountCommand { Origin = request.Origin!.Value, Amount = request.Amount }, cancellationToken);
                     return withdrawResult.IsSuccess ? Result<object>.Success(withdrawResult.Value!) : Result<object>.Failure(withdrawResult.Error!);
+                case "transfer":
+                    var transferResult = await mediator.Send(new TransferAccountCommand { Origin = request.Origin!.Value, Destination = request.Destination!.Value, Amount = request.Amount }, cancellationToken);
+                    return transferResult.IsSuccess ? Result<object>.Success(transferResult.Value!) : Result<object>.Failure(transferResult.Error!);
                 default:
                     throw new NotImplementedException();
             }

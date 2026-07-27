@@ -5,16 +5,16 @@ using MediatR;
 
 namespace BankApi.Api.Domain.Commands
 {
-    public class TransferCommandHandler : IRequestHandler<TransferCommand, Result<AccountTransferDto>>
+    public class TransferAccountCommandHandler : IRequestHandler<TransferAccountCommand, Result<AccountTransferDto>>
     {
         private readonly IAccountRepository repository;
 
-        public TransferCommandHandler(IAccountRepository repository)
+        public TransferAccountCommandHandler(IAccountRepository repository)
         {
             this.repository = repository;
         }
 
-        public async Task<Result<AccountTransferDto>> Handle(TransferCommand request, CancellationToken cancellationToken)
+        public async Task<Result<AccountTransferDto>> Handle(TransferAccountCommand request, CancellationToken cancellationToken)
         {
             var transferResult = await repository.Transfer(request.Origin, request.Destination, request.Amount);
             if (transferResult == null)
