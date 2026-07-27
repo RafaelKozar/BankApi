@@ -13,5 +13,7 @@ namespace BankApi.Api.Domain.Repositories
         public Task<Account?> Withdraw(long id, decimal amount);
 
         public Task<Dictionary<int, Account>?> Transfer(long origin, long destination, decimal amount);
+
+        public Task Reset();
     }
 }

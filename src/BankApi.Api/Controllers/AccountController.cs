@@ -31,5 +31,12 @@ namespace BankApi.Api.Controllers
             return result.ToActionResult();
         }
 
+        [HttpPost("/reset")]
+        public async Task<ActionResult> Reset()
+        {
+            await mediator.Send(new ResetAccountsCommand());
+            return Ok();
+        }
+
     }
 }

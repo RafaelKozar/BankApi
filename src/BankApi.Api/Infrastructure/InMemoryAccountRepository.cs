@@ -100,5 +100,12 @@ namespace BankApi.Api.Infrastructure
 
         private SemaphoreSlim GetLock(long id) =>
                 _locks.GetOrAdd(id, _ => new SemaphoreSlim(1, 1));
+
+        public Task Reset()
+        {
+            _accounts.Clear();
+            _locks.Clear();
+            return Task.CompletedTask;
+        }
     }
 }
