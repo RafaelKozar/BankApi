@@ -30,7 +30,7 @@ namespace BankApi.Api.Infrastructure
                 return _accounts.AddOrUpdate(
                     id,
                     addValueFactory: _ => new Account { Id = id, Balance = amount },
-                    updateValueFactory: (_, existing) => new Account { Id = existing.Id, Balance = existing.Balance + amount });
+                    updateValueFactory: (_, existing) => existing.Deposit(amount));
             }
             finally
             {
@@ -49,7 +49,7 @@ namespace BankApi.Api.Infrastructure
                     return null;
                 }
 
-                var updated = new Account { Id = existing.Id, Balance = existing.Balance - amount };
+                var updated = existing.Withdraw(amount);
                 _accounts.TryUpdate(id, updated, existing);
                 return updated;
             }
@@ -63,10 +63,10 @@ namespace BankApi.Api.Infrastructure
         {
             var lesserId = Math.Min(origin, destination);
             var greaterId = Math.Max(origin, destination);
-            var lockFirst = GetLock(lesserId);
-            var lockSecond = GetLock(greaterId);
-            await lockFirst.WaitAsync();
-            await lockSecond.WaitAsync();
+            var @lockFirst = GetLock(lesserId);
+            var @lockSecond = GetLock(greaterId);
+            await @lockFirst.WaitAsync();
+            await @lockSecond.WaitAsync();
             try
             {
                 if (!_accounts.TryGetValue(origin, out var existingOrigin))
@@ -79,10 +79,10 @@ namespace BankApi.Api.Infrastructure
                     return null;
                 }
 
-                var updatedOrigin = new Account { Id = existingOrigin.Id, Balance = existingOrigin.Balance - amount };
+                var updatedOrigin = existingOrigin.Withdraw(amount);
                 _accounts.TryUpdate(origin, updatedOrigin, existingOrigin);
 
-                var updatedDestination = new Account { Id = existingDestination.Id, Balance = existingDestination.Balance + amount };
+                var updatedDestination = existingDestination.Deposit(amount);
                 _accounts.TryUpdate(destination, updatedDestination, existingDestination);
 
                 return new Dictionary<long, Account>
@@ -93,8 +93,8 @@ namespace BankApi.Api.Infrastructure
             }
             finally
             {
-                lockSecond.Release();
-                lockFirst.Release();
+                @lockSecond.Release();
+                @lockFirst.Release();
             }
         }
 
